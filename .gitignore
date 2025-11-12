@@ -1,0 +1,26 @@
+# Ignore Jupyter notebooks
+*.ipynb
+
+# Ignore PDF files
+*.pdf
+
+# Ignore specific personal text file
+personal.txt
+req.txt
+
+# Ignore virtual environment
+venv/
+venv*/
+.env
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore VSCode settings (optional)
+.vscode/
+
+# Ignore macOS junk files (optional)
+.DS_Store
