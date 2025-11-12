@@ -47,3 +47,26 @@ class PromptManager :
         ])
 
         return prompt
+    
+    
+    @staticmethod
+    def get_stuff_prompt() -> ChatPromptTemplate :
+        """
+        Prompt template for the 'stuff' summarization chain.
+        Used for short legal documents that can be summarized directly.
+        """
+
+
+
+        system_template = """You are a professional legal assistant skilled at summarising legal documents.
+        Your task is to read the provided legal document and genrate a clear, concise and well structured summary in {language}
+        """
+
+        user_template = "Provide a summary of the following legal document: \n\n {text}"
+
+        prompt = ChatPromptTemplate.from_messages([
+            ("system" , system_template),
+            ("user" , user_template)
+        ])
+
+        return prompt
