@@ -1,8 +1,6 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.chains.summarize import load_summarize_chain
 from langchain.schema import Document
-from langchain_google_genai import ChatGoogleGenerativeAI
 from abc import ABC , abstractmethod
 from prompts import PromptManager
 
@@ -33,7 +31,7 @@ class DocumentAnalyser :
         if token_count > DocumentAnalyser.TOKEN_THRESHOLD :
             return "map_reduce"
         else :
-            return "map_summarize"
+            return "stuff"
 
 
 class BaseSummarizer(ABC) :
@@ -73,67 +71,70 @@ class BaseSummarizer(ABC) :
 
 
 
+class StuffSummariser(BaseSummarizer) :
+    '''
+    Summarizer class for smaller documents using the 'stuff' chain type.
+    '''
+    def summarize(self , documents : list[Document] , language : str = "English") -> str:
+        """Summarizes the given documents using the 'stuff' approach."""
+        self.validate_docs(documents)
 
-class MapReduceSummarizer :
+        try : 
+
+            chain = load_summarize_chain(
+                llm = self.llm ,
+                chain_type = "stuff" ,
+                prompt = PromptManager.get_stuff_prompt()
+            )
+
+            summary = chain.invoke({
+                    "text" : documents ,
+                    "language" : language
+            })
+
+            if isinstance(summary , dict) and "output_text" in summary :
+                return summary["output_text"]
+            
+            else :
+                return str(summary)
+            
+        except Exception as e:
+            raise RuntimeError(f"Error during summarization using stuff chain : {e}")
+
+
+
+
+
+class MapReduceSummarizer(BaseSummarizer) :
     '''
     Document summarizer using MapReduce chain strategy. 
     How MapReduce Works:
     1. MAP Phase: Document is split into chunks, each chunk is summarized separately
     2. REDUCE Phase: All chunk summaries are combined into one final summary
     '''
-    def __init__(self , llm , chunk_size : int = 400 , chunk_overlap : int = 90) :
-        self.llm = llm
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
 
-    
-    def validate_docs(self, documents : list[Document]) -> None :
-        '''Checks if the incoming documents are valid.'''
-        
-        if not documents or len(documents) == 0 :
-            raise ValueError("No documents provided for summarization.")
-        
-        
-    def split_docs(self , documents : list[Document]) -> list[Document] :
-        """Splits the incoming documents into smaller chunks."""
-        self.validate_docs(documents)
+    def summarize(self, documents : list[Document]) -> str :
 
-        try : 
-            splitter = RecursiveCharacterTextSplitter(
-                chunk_size = self.chunk_size , 
-                chunk_overlap = self.chunk_overlap
-            )
-            return splitter.split_documents(documents)
-        except Exception as e:
-            raise RuntimeError(f"Error splitting document: {e}")
-        
-    def summarize(self , documents : list[Document]) :
-  
-        """Performs summarization using map-reduce chain."""
         chunks = self.split_docs(documents)
-
-        map_prompt = PromptManager.get_map_prompt()
-        reduce_prompt = PromptManager.get_reduce_prompt()
 
         try : 
 
             chain = load_summarize_chain(
                 llm = self.llm , 
-                chain_type = "map_reduce" ,
-                map_prompt = map_prompt , 
-                combine_prompt = reduce_prompt
+                chain_type = "map_reduce" , 
+                map_prompt = PromptManager.get_map_prompt() ,
+                combine_prompt = PromptManager.get_reduce_prompt()
             )
 
-            summary = chain.invoke(chunks)
+            summary = chain.invoke({"text" : chunks})
 
-            if isinstance(summary , dict) :
-                return summary['output_text']
+            if isinstance(summary , dict) and "output_text" in summary :
+                return summary["output_text"]
             else :
                 return str(summary)
-        
+            
         except Exception as e:
-            raise RuntimeError(f"Error during summarization: {e}")
-
+            raise RuntimeError(f"Error during summarization using map_reduce chain : {e}")
 
 
         
