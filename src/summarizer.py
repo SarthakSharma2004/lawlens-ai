@@ -56,6 +56,38 @@ class PromptManager :
     
 
 
+
+class DocumentAnalyser :
+    """
+    Analyzes a list of Document objects and determines
+    the total text length and which summarization approach to use.
+    """
+    TOKEN_THRESHOLD = 8000
+    CHARS_PER_TOKEN = 4
+
+    @staticmethod
+    def count_tokens(documents : list[Document]) -> int :
+        """Estimates token count from documents"""
+        total_chars = sum(len(doc.page_content) for doc in documents)
+        estimated_tokens = (total_chars // DocumentAnalyser.CHARS_PER_TOKEN)
+        return estimated_tokens
+
+    @staticmethod
+    def suggest_chain_type(documents : list[Document]) -> str :
+        """Determines which summarization approach to use based on token count"""
+        token_count = DocumentAnalyser.count_tokens(documents)
+        if token_count > DocumentAnalyser.TOKEN_THRESHOLD :
+            return "map_reduce"
+        else :
+            return "map_summarize"
+
+
+
+
+
+
+
+
 class MapReduceSummarizer :
     '''
     Document summarizer using MapReduce chain strategy. 
