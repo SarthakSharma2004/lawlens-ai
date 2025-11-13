@@ -3,8 +3,9 @@ from rag.vector_store import VectorStore
 from langchain.schema import Document
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
-from prompts import PromptManager
+from prompt_templates.prompts import PromptManager
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 class RagPipeline :
     '''
     Builds and runs the full RAG pipeline

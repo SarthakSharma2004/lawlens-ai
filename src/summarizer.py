@@ -2,7 +2,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 from langchain.schema import Document
 from abc import ABC , abstractmethod
-from prompts import PromptManager
+from prompt_templates.prompts import PromptManager
 
 
 
