@@ -1,4 +1,4 @@
-class Retriever :
+class RetrieverBuilder :
     """
     Creates a retriever from a vector store.
     This retriever will be used by the QA pipeline to fetch
@@ -11,6 +11,7 @@ class Retriever :
         Convert vectorstore into a retriever.
         """
         retriver = vectorstore.as_retriever(search_type = "similarity" , k = k)
+
         return retriver
 
 
