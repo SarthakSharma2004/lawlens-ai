@@ -7,6 +7,7 @@
 # Ignore specific personal text file
 personal.txt
 req.txt
+legal.txt
 
 # Ignore virtual environment
 venv/
