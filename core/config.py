@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     
     GOOGLE_API_KEY: str = Field(..., description="Google API Key")
     GROQ_API_KEY: str = Field(..., description="Groq API Key")
+    ELEVENLABS_API_KEY : str = Field(..., description="Elevenlabs API Key")
+    ELEVENLABS_VOICE_ID : str = Field(..., description="Elevenlabs Voice ID")
 
 
     # Optional fields with default values
