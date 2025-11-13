@@ -88,7 +88,7 @@ class StuffSummariser(BaseSummarizer) :
             )
 
             summary = chain.invoke({
-                    "text" : documents ,
+                    "input_documents" : documents ,
                     "language" : language
             })
 
@@ -152,13 +152,17 @@ class SummarizerFactory :
             raise ValueError(f"Unknown chain type: {chain_type}")
         
     
-# Convenience Function
+
 
 def summarize_document(llm , documents : list[Document] , language : str = "English") -> str :
-    summarizer = SummarizerFactory.create_summarizer(llm , documents) # Returns the summarizer (Mapreduce or Stuff)
-    return summarizer.summarize(documents , language)
+    '''
+    A convenience function that Summarizes a list of documents using the appropriate summarization strategy.
+    '''
 
-        
+    summarizer = SummarizerFactory.create_summarizer(llm , documents) # Returns the summarizer (Mapreduce or Stuff)
+    return summarizer.summarize(documents , language) 
+
+
 
 
 

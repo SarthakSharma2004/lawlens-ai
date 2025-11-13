@@ -4,7 +4,7 @@ from core.config import get_settings
 
 class TextToSpeech :
     settings = get_settings()
-    client = ElevenLabs(settings.ELEVENLABS_API_KEY)
+    client = ElevenLabs(api_key = settings.ELEVENLABS_API_KEY)
 
     @staticmethod
     def text_to_speech(summary_text : str) -> bytes :
@@ -17,7 +17,7 @@ class TextToSpeech :
             text = summary_text , 
             voice_id = TextToSpeech.settings.ELEVENLABS_VOICE_ID ,
             model_id = "eleven_multilingual_v2" ,
-            output_format = "mp3_44100_12" ,
+            output_format = "mp3_44100_128" ,
             voice_settings={
                 "stability": 0.4,
                 "similarity_boost": 0.9,

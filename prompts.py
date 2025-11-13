@@ -70,3 +70,23 @@ class PromptManager :
         ])
 
         return prompt
+
+    @staticmethod
+    def get_rag_prompt() -> ChatPromptTemplate :
+        """
+        Prompt template for the RAG chain
+        """
+
+        system_template = """You are a legal document assistant. 
+        Use the provided retrieved document context from a legal document to answer the user's question. 
+        If the answer is not in the context, say 'I cannot find the information in the document'.
+        Do NOT hallucinate."""
+
+        user_template = "\n\n Context : {context}. \n\n Question : {question}. Provide a clear factual based answer based on the context provided in {language}."
+
+        prompt = ChatPromptTemplate.from_messages([
+            ("system" , system_template),
+            ("user" , user_template)
+        ])
+
+        return prompt
