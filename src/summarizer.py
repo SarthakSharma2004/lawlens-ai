@@ -12,7 +12,7 @@ class DocumentAnalyser :
     the total text length and which summarization approach to use.
     """
 
-    TOKEN_THRESHOLD = 8000
+    TOKEN_THRESHOLD = 12000
     CHARS_PER_TOKEN = 4
 
     @staticmethod
@@ -65,7 +65,7 @@ class BaseSummarizer(ABC) :
         
     @abstractmethod
     def summarize(self , documents : list[Document]) :
-        """Each summarizer (MapReduce, Stuff, etc.) will implement this."""
+        """Each summarizer (MapReduce, Stuff) will implement this."""
         pass
 
 
@@ -138,6 +138,29 @@ class MapReduceSummarizer(BaseSummarizer) :
 
 
         
+
+class SummarizerFactory :
+    
+    @staticmethod
+    def create_summarizer(llm , documents : list[Document]) -> BaseSummarizer :
+        chain_type = DocumentAnalyser.suggest_chain_type(documents)
+        if chain_type == "stuff" :
+            return StuffSummariser(llm)
+        elif chain_type == "map_reduce" :
+            return MapReduceSummarizer(llm)
+        else :
+            raise ValueError(f"Unknown chain type: {chain_type}")
+        
+    
+# Convenience Function
+
+def summarize_document(llm , documents : list[Document] , language : str = "English") -> str :
+    summarizer = SummarizerFactory.create_summarizer(llm , documents) # Returns the summarizer (Mapreduce or Stuff)
+    return summarizer.summarize(documents , language)
+
+        
+
+
 
 
 
