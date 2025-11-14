@@ -10,6 +10,8 @@ from langchain_groq import ChatGroq
 from src.summarizer_pipeline import SummarizerPipeline
 from rag.rag_pipeline import RagPipeline
 
+from schema.response_model import SummaryResponse , RAGResponse
+
 settings = get_settings()
 
 MODEL_VERSION = "1.0.0"
@@ -61,7 +63,7 @@ def read_health() :
 #  SUMMARIZATION ENDPOINT
 # ---------------------------
 
-@app.post("/summarize")
+@app.post("/summarize" , response_model = SummaryResponse)
 async def summarize_text(file : UploadFile = File(...) , language : str = "English" , tts : bool = False) :
     
     try :
@@ -90,27 +92,36 @@ async def summarize_text(file : UploadFile = File(...) , language : str = "Engli
         raise HTTPException(status_code=400, detail=str(e))
     
 
+# ---------------------------
+#  RAG ENDPOINT
+# ---------------------------
 
-@app.post("/rag/ask")
+
+@app.post("/rag/ask" , response_model = RAGResponse)
 async def rag_ask(file : UploadFile = File(...) , query : str = "" , language : str = "English") :
     
         '''Save uploaded file temporarily'''
         if query == "" :
             raise HTTPException(status_code=400, detail="Please provide a query")
         
-        try : 
+        try:
+            # Save uploaded file
             with tempfile.NamedTemporaryFile(delete=False) as tmp:
                 tmp_path = tmp.name
                 shutil.copyfileobj(file.file, tmp)
 
-            rag_pipeline = RagPipeline(llm = get_llm())
+            # Create pipeline
+            rag_pipeline = RagPipeline(llm=get_llm())
 
-            answer = rag_pipeline.ask(query = query , file_path = tmp_path , language = language)
+            # Build index from uploaded file
+            rag_pipeline.build_index(tmp_path)
+
+            # Then ask question
+            answer = rag_pipeline.ask(query, language)
 
             return {"answer": answer}
 
-        
-        except Exception as e :
+        except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 
     
