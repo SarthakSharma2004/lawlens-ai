@@ -70,6 +70,8 @@ class PromptManager :
         ])
 
         return prompt
+    
+    
 
     @staticmethod
     def get_rag_prompt() -> ChatPromptTemplate :

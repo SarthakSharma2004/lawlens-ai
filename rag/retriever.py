@@ -1,3 +1,4 @@
+
 class RetrieverBuilder :
     """
     Creates a retriever from a vector store.
@@ -10,7 +11,7 @@ class RetrieverBuilder :
         """
         Convert vectorstore into a retriever.
         """
-        retriver = vectorstore.as_retriever(search_type = "similarity" , k = k)
+        retriver = vectorstore.as_retriever(search_type = "similarity" , search_kwargs = {"k" : k})
 
         return retriver
 

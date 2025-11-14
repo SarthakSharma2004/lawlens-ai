@@ -1,11 +1,10 @@
 from src.document_processor import DocumentProcessorFactory
 from src.summarizer import summarize_document
 from src.speech import TextToSpeech
-from core.config import get_settings
 from langchain_core.language_models import BaseChatModel
 
 
-settings = get_settings()
+
 class SummarizerPipeline :
     """
     Full orchestration:

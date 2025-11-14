@@ -14,11 +14,15 @@ class VectorStore :
         '''
         
         try : 
-            embedder = Embedder.get_embedder()
+            '''Calls the embedder model (gemini embeddings)'''
+            embedder = Embedder.get_embedder() 
+
+            '''Creates the vector store'''
             vectorstore =  Chroma.from_documents(
                 documents = chunks ,
                 embedding = embedder , 
-                persist_directory = persist_dir
+                persist_directory = persist_dir , 
+                collection_name = "lawlens_documents"
             ) 
 
             return vectorstore

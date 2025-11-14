@@ -5,36 +5,54 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from prompt_templates.prompts import PromptManager
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.language_models import BaseChatModel
+from src.document_processor import DocumentProcessorFactory
+
+
 
 class RagPipeline :
-    '''
-    Builds and runs the full RAG pipeline
-    '''
+    def __init__(self , llm : BaseChatModel , chunk_size : int = 400 , chunk_overlap : int = 80) -> None :
+        self.llm = llm
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.retriever = None
 
-    @staticmethod
-    def build_pipeline(llm , documents : list[Document] , persist_dir : str = None) :
-        '''Full RAG pipeline'''
-        splitter = RecursiveCharacterTextSplitter(chunk_size = 400 , chunk_overlap = 80)
+    def build_index(self , file_path : str) :
+        docs = DocumentProcessorFactory.process(file_path)
+        
 
-        chunks = splitter.split_documents(documents)
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size = self.chunk_size ,
+            chunk_overlap = self.chunk_overlap
+        )
 
-        ''' Build Vector Store (embeddings + storage)'''
-        vectorstore = VectorStore.build_vector_store(chunks , persist_dir)
+        chunks = splitter.split_documents(docs)
 
-        ''' Build Retriever '''
-        retriever = RetrieverBuilder.build_retriever(vectorstore)
+        vectorstore = VectorStore.build_vector_store(chunks)
 
-        ''' Build Chain '''
-        stuff_chain = create_stuff_documents_chain(llm = llm , prompt = PromptManager.get_rag_prompt())
+        self.retriever = RetrieverBuilder.build_retriever(vectorstore)
 
-        retriever_chain = create_retrieval_chain(stuff_chain , retriever)
 
-        return retriever_chain
+    def ask(self , query : str , language : str = "English") :
+        if self.retriever is None :
+            raise RuntimeError("Index not built. Call build_index() first.")
+        
+        stuff_chain = create_stuff_documents_chain(llm = self.llm , prompt = PromptManager.get_rag_prompt())
+
+        chain = create_retrieval_chain(
+            self.retriever ,
+            stuff_chain
+
+        )
+
+        response = chain.invoke(
+            {"input" : query , "language" : language}
+        )
+
+        return response['answer']
     
-    @staticmethod
-    def run_pipeline(llm , documents , query : str , language : str = "English") -> str :
-        chain = RagPipeline.build_pipeline(llm , documents)
 
-        result = chain.invoke({"input" : query , "language" : language})
 
-        return result
+
+
+
