@@ -63,12 +63,15 @@ def read_health() :
 #  SUMMARIZATION ENDPOINT
 # ---------------------------
 
+
 @app.post("/summarize" , response_model = SummaryResponse)
 async def summarize_text(file : UploadFile = File(...) , language : str = "English" , tts : bool = False) :
     
     try :
         '''Save uploaded file temporarily'''
-        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        suffix = os.path.splitext(file.filename)[1]  # get .pdf / .txt / .docx
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp_path = tmp.name
             shutil.copyfileobj(file.file, tmp)
 
@@ -91,6 +94,7 @@ async def summarize_text(file : UploadFile = File(...) , language : str = "Engli
     except Exception as e :
         raise HTTPException(status_code=400, detail=str(e))
     
+    
 
 # ---------------------------
 #  RAG ENDPOINT
@@ -106,9 +110,13 @@ async def rag_ask(file : UploadFile = File(...) , query : str = "" , language : 
         
         try:
             # Save uploaded file
-            with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            suffix = os.path.splitext(file.filename)[1]  # get .pdf / .txt / .docx
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
                 tmp_path = tmp.name
                 shutil.copyfileobj(file.file, tmp)
+
+            
 
             # Create pipeline
             rag_pipeline = RagPipeline(llm=get_llm())

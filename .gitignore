@@ -3,6 +3,7 @@
 
 # Ignore PDF files
 *.pdf
+app.py
 
 # Ignore specific personal text file
 personal.txt

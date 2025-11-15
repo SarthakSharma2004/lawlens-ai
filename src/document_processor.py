@@ -6,6 +6,11 @@ from abc import ABC, abstractmethod
 from langchain_core.documents import Document
 
 class DataProcessor(ABC) :
+    '''
+    Abstract base class for all file processors.
+    Stores the file path. Enforces that every subclass implements an extract_text() method returning Document objects.
+    '''
+
     def __init__(self , file_path : str) -> None :
         self.file_path = file_path
 
@@ -35,6 +40,9 @@ class TXTProcessor(DataProcessor) :
         
     
 class DOCXProcessor(DataProcessor) :
+
+    # def __init__(self , file_path : str) -> None :
+    #     super().__init__(file_path) -> no need
     def extract_text(self) -> list[Document] :
         try : 
             loader = Docx2txtLoader(self.file_path)
@@ -55,6 +63,7 @@ class DocumentProcessorFactory :
         Determines the appropriate processor class based on file extension
         and returns an instance of that processor.
         """
+
         if file_path.endswith(".pdf") :
             return PDFProcessor(file_path)
         elif file_path.endswith(".txt") :
@@ -63,6 +72,7 @@ class DocumentProcessorFactory :
             return DOCXProcessor(file_path)
         else :
             raise ValueError(f"Unsupported file format: {file_path}")
+        
         
     @staticmethod
     def process(file_path : str) :

@@ -2,7 +2,7 @@
 class RetrieverBuilder :
     """
     Creates a retriever from a vector store.
-    This retriever will be used by the QA pipeline to fetch
+    This retriever will be used by the pipeline to fetch
     relevant document chunks for answering user queries.
     """
     @staticmethod

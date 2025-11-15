@@ -11,7 +11,7 @@ class PromptManager :
         This runs on each chunk separately.
         '''
 
-        system_template = "You are a skilled legal document summarizer that creates clear and consise summaries of legal text chunks"
+        system_template = "You are a skilled legal document summarizer that creates clear and consise summaries of legal text chunks in {language}"
 
         user_template = "Summarize the following text chunk by extracting the main points and key information clearly. \n\n{text}"
 
@@ -31,7 +31,7 @@ class PromptManager :
         """
 
         # system_template = "You are a legal document summarizer skilled at creating clear and consise summaries from legal text chunks"
-        system_template = "You are a legal document summarizer skilled at combining multiple partial summaries from legal text chunks into a single final summary"
+        system_template = "You are a legal document summarizer skilled at combining multiple partial summaries from legal text chunks into a single final summary in {language}"
 
         user_template = """Combine the following partial summaries into a single, cohesive well-structured summary
         Requirements:

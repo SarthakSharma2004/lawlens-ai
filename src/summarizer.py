@@ -13,7 +13,9 @@ class DocumentAnalyser :
     """
 
     TOKEN_THRESHOLD = 12000
-    CHARS_PER_TOKEN = 4
+
+    '''ONE TOKEN ~ 4 CHARS'''
+    CHARS_PER_TOKEN = 4     
 
     @staticmethod
     def count_tokens(documents : list[Document]) -> int :
@@ -22,6 +24,7 @@ class DocumentAnalyser :
         total_chars = sum(len(doc.page_content) for doc in documents)
         estimated_tokens = (total_chars // DocumentAnalyser.CHARS_PER_TOKEN)
         return estimated_tokens
+    
 
     @staticmethod
     def suggest_chain_type(documents : list[Document]) -> str :
@@ -75,6 +78,7 @@ class StuffSummariser(BaseSummarizer) :
     '''
     Summarizer class for smaller documents using the 'stuff' chain type.
     '''
+
     def summarize(self , documents : list[Document] , language : str = "English") -> str:
         """Summarizes the given documents using the 'stuff' approach."""
         self.validate_docs(documents)
@@ -113,7 +117,7 @@ class MapReduceSummarizer(BaseSummarizer) :
     2. REDUCE Phase: All chunk summaries are combined into one final summary
     '''
 
-    def summarize(self, documents : list[Document]) -> str :
+    def summarize(self, documents : list[Document] , language : str = "English") -> str :
 
         chunks = self.split_docs(documents)
 
@@ -126,7 +130,7 @@ class MapReduceSummarizer(BaseSummarizer) :
                 combine_prompt = PromptManager.get_reduce_prompt()
             )
 
-            summary = chain.invoke({"text" : chunks})
+            summary = chain.invoke({"text" : chunks , "language" : language})
 
             if isinstance(summary , dict) and "output_text" in summary :
                 return summary["output_text"]

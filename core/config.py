@@ -6,8 +6,14 @@ from typing import Set, Tuple
 class Settings(BaseSettings):
 
     """
-    Defines a centralized configuration class that loads and validates environment variables (like API keys, limits, and allowed settings)
-    using Pydantic BaseSettings, keeping all application settings organized and easily accessible. 
+    Application configuration and environment loader.
+
+    - Fetches sensitive values from the .env by automatically validating .env variables using Pydantic at runtime (uvicorn main:app).
+    - Stores global constants for file handling and language support.
+    - Ensures consistent configuration usage across all modules.
+
+    Defines a centralized configuration class that loads and validates environment variables (like API keys etc. )
+    using Pydantic BaseSettings. Stores global constants for file handling and language support ennsuring consistent configuration usage across all modules.
     """
 
     
