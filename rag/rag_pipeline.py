@@ -17,7 +17,9 @@ class RagPipeline :
         self.chunk_overlap = chunk_overlap
         self.retriever = None
 
-    def build_index(self , file_path : str) :
+
+    def build_index(self , file_path : str , persist_dir : str = None)  :
+        self.persist_dir = persist_dir
         docs = DocumentProcessorFactory.process(file_path)
         
 
