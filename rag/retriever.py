@@ -11,9 +11,9 @@ class RetrieverBuilder :
         """
         Convert vectorstore into a retriever.
         """
-        retriver = vectorstore.as_retriever(search_type = "similarity" , search_kwargs = {"k" : k})
+        retriever = vectorstore.as_retriever(search_type = "similarity" , search_kwargs = {"k" : k})
 
-        return retriver
+        return retriever
 
 
          

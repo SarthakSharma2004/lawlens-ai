@@ -1,4 +1,4 @@
-from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
 from rag.embedder import Embedder
 class VectorStore :
