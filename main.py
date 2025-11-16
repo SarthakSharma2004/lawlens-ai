@@ -1,26 +1,29 @@
-from fastapi import FastAPI , UploadFile, File , HTTPException
-from pydantic import Field
+from fastapi import FastAPI , UploadFile, File , HTTPException 
+from fastapi.responses import JSONResponse
+from pydantic import Field 
 import os
 import tempfile
 import shutil
+from pathlib import Path
 
 from core.config import get_settings
 from langchain_groq import ChatGroq
 
-
-
 from src.summarizer_pipeline import SummarizerPipeline
+from rag.rag_pipeline import RagPipeline
 
+from schema.request_model import RAGInput
+from schema.response_model import RAGResponse, RAGSource
 
 settings = get_settings()
 
 MODEL_VERSION = "1.0.0"
 
-PERSIST_DIR = "rag_storage"
-os.makedirs(PERSIST_DIR , exist_ok = True)
 
 llm = ChatGroq(model = "llama-3.3-70b-versatile" , 
                api_key = settings.GROQ_API_KEY)
+
+rag_pipeline = RagPipeline(llm)
 
 
 app = FastAPI(
@@ -28,6 +31,7 @@ app = FastAPI(
      description="API for Summarizing leagal files along with RAG",
      version = MODEL_VERSION
  )
+ 
 
 
 # ------------
@@ -121,137 +125,103 @@ async def summarize_text(
 
 
 
+#-------------------------------------
+# RAG UPLOAD DOCUMENTS (INDEX BUILDER)
+#-------------------------------------
 
+@app.post("/rag/index")
+async def build_index(file : UploadFile = File(...)) :
+    '''Upload a document (PDF, TXT, DOCX) and ingest it.
+    Build vector store and retriever for querying.'''
 
+    try :
 
+        file_ext = Path(file.filename).suffix.lower()
 
-
-
-
-
-
-
-
-
-
-# settings = get_settings()
-
-# MODEL_VERSION = "1.0.0"
-
-# app = FastAPI(
-#     title = "Legal Document Summarizer and RAG API",
-#     description="API for Summarizing leagal files along with RAG",
-#     version = MODEL_VERSION
-# )
-
-
-# def get_llm() :
-#     llm = ChatGroq(
-#         model = "llama-3.3-70b-versatile" , 
-#         api_key = settings.GROQ_API_KEY
-#     )
-
-#     return llm
-
-
-
-# # ---------------------------
-# #  NORMAL LANDING PAGE
-# # ---------------------------
-
-
-# @app.get("/")
-# def read_root() :
-#     return {
-#         "LawLens : A legal document summarizer with voice support and RAG"
-#     }
-
-
-
-# @app.get("/health")
-# def read_health() :
-#     return {
-#         "status" : "OK" , 
-#         "version" : MODEL_VERSION , 
-#         "API" : "up and running" , 
-#         "endpoints" : [
-#             "/summarize" , 
-#             "/rag/ask"
-#         ]
-#     }
-
-
-# # ---------------------------
-# #  SUMMARIZATION ENDPOINT
-# # ---------------------------
-
-
-# @app.post("/summarize" , response_model = SummaryResponse)
-# async def summarize_text(file : UploadFile = File(...) , language : str = "English" , tts : bool = False) :
-    
-#     try :
-#         '''Save uploaded file temporarily'''
-#         suffix = os.path.splitext(file.filename)[1]  # get .pdf / .txt / .docx
-
-#         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-#             tmp_path = tmp.name
-#             shutil.copyfileobj(file.file, tmp)
-
-#             pipeline = SummarizerPipeline(llm = get_llm() , language = language)
-
-#             result = pipeline.run(file_path = tmp_path , tts = tts)
-
-#         # 4. Formatting output
-#         if tts:
-#             summary_text, audio_bytes = result
-
-#             return {
-#                 "summary": summary_text,
-#                 "audio_bytes": audio_bytes.hex()   # send audio as hex string
-#             }
-#         else:
-#             return {"summary": result}
-
+        if file_ext not in settings.ALLOWED_EXTENSIONS :
+            raise HTTPException(status_code=400, detail = f"Invalid file type : {file_ext}. Allowed extensions : {settings.ALLOWED_EXTENSIONS}")
         
-#     except Exception as e :
-#         raise HTTPException(status_code=400, detail=str(e))
-    
-    
+        with tempfile.NamedTemporaryFile(delete=False , suffix=file_ext) as tmp:
+            file_path = tmp.name
+            shutil.copyfileobj(file.file, tmp)
 
-# # ---------------------------
-# #  RAG ENDPOINT
-# # ---------------------------
+            result = rag_pipeline.ingest_documents(file_path)
+            os.remove(file_path)
 
-
-# @app.post("/rag/ask" , response_model = RAGResponse)
-# async def rag_ask(file : UploadFile = File(...) , query : str = "" , language : str = "English") :
-    
-#         '''Save uploaded file temporarily'''
-#         if query == "" :
-#             raise HTTPException(status_code=400, detail="Please provide a query")
-        
-#         try:
-#             # Save uploaded file
-#             suffix = os.path.splitext(file.filename)[1]  # get .pdf / .txt / .docx
-
-#             with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-#                 tmp_path = tmp.name
-#                 shutil.copyfileobj(file.file, tmp)
-
+            return JSONResponse(
+                content = {
+                    "status" : result['status'] ,
+                    "message" : result['message'] , 
+                    "chunks" : result['chunks'] ,
+                   
+                }
+            )
             
+        
 
-#             # Create pipeline
-#             rag_pipeline = RagPipeline(llm=get_llm())
-
-#             # Build index from uploaded file
-#             rag_pipeline.build_index(tmp_path)
-
-#             # Then ask question
-#             answer = rag_pipeline.ask(query, language)
-
-#             return {"answer": answer}
-
-#         except Exception as e:
-#             raise HTTPException(status_code=400, detail=str(e))
-
+    except Exception as e :
+        raise HTTPException(status_code=500, detail=str(e))
     
+
+
+#---------------------
+# RAG ASK QUESTION
+#---------------------
+
+
+@app.post("/rag/ask" , response_model = RAGResponse)
+async def ask(request : RAGInput) :
+    '''Ask a question and get RAG-enhanced answer. request is an object of Pydantic class RAGInput'''
+    query = request.query
+    language = request.language
+
+    try :
+        if not query :
+            raise HTTPException(status_code=400, detail="Query can't be empty. Please provide a query")
+        
+        if language not in settings.SUPPORTED_LANGUAGES :
+            raise HTTPException(status_code=400, detail="Invalid language")
+        
+        if rag_pipeline.retriever is None :
+            raise HTTPException(status_code=400, detail="Index not built. Please upload a document first.")
+
+
+        result , retrieved_docs = rag_pipeline.ask_question(query , language)
+
+        sources = [
+        RAGSource(
+            content=doc.page_content
+        )
+        for doc in retrieved_docs
+    ] 
+        
+        return RAGResponse(
+            answer = result , 
+            sources = sources
+
+        )
+
+    except Exception as e :
+        raise HTTPException(status_code=500, detail = f"Error processing query : {str(e)}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
