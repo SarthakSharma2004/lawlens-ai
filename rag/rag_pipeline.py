@@ -44,7 +44,7 @@ class RagPipeline :
 
             vectorstore = VectorStore.build_vector_store(chunks)
 
-            self.retriever = RetrieverBuilder.build_retriever(vectorstore)
+            self.retriever = RetrieverBuilder.build_retriever(vectorstore) # stored retriever
 
             return {
                 "status": "success",
@@ -64,6 +64,8 @@ class RagPipeline :
 
             if self.retriever is None :
                 raise RuntimeError("Index not built , No documents ingested. Call ingest_documents() first.")
+            
+            retrieved_docs = self.retriever.get_relevant_documents(query)
         
             stuff_chain = create_stuff_documents_chain(
                 llm = self.llm , prompt = self.prompt
@@ -78,7 +80,7 @@ class RagPipeline :
                 {"input" : query , "language" : language}
             )
 
-            return response['answer']
+            return response['answer'] , retrieved_docs
 
         except Exception as e:
             raise RuntimeError(f"Error during question-answering: {e}")
