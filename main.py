@@ -1,4 +1,4 @@
-from fastapi import FastAPI , UploadFile, File , HTTPException 
+from fastapi import FastAPI, Form , UploadFile, File , HTTPException 
 from fastapi.responses import JSONResponse
 from pydantic import Field 
 import os
@@ -64,8 +64,8 @@ def read_health() :
 @app.post("/summarize") 
 async def summarize_text(
     file : UploadFile = File(...) ,
-    language : str = "English" ,
-    tts : bool = False
+    language : str = Form("English")  ,
+    tts : bool =Form(False)       
 ) :
     
     tmp_path = None
