@@ -1,9 +1,10 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from core.config import get_settings
 
+settings = get_settings()
 
 class TextToSpeech :
-    settings = get_settings()
+    
 
     client = ChatGoogleGenerativeAI(
         model = "gemini-2.5-flash-preview-tts" , 

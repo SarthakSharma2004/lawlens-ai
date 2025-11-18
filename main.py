@@ -12,8 +12,8 @@ from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 
-from src.summarizer_pipeline import SummarizerPipeline
-from rag.rag_pipeline import RagPipeline
+from pipelines.summarizer_pipeline import SummarizerPipeline
+from pipelines.rag_pipeline import RagPipeline
 
 from schema.request_model import RAGInput
 from schema.response_model import RAGResponse, RAGSource
@@ -49,7 +49,7 @@ app = FastAPI(
 @app.get("/")
 def read_root() :
     return {
-        "LawLens : A voice enab,ed legal document summarizer with RAG"
+        "LawLens : A voice enabled legal document summarizer with RAG"
     }
 
 

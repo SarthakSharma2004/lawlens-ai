@@ -1,0 +1,17 @@
+frontend/
+personal/
+.git
+.gitignore
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+node_modules/
+*.db
+*.log
+.DS_Store
+*.ipynb
+.ipynb_checkpoints/
+
