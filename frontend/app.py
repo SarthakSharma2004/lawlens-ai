@@ -1,3 +1,5 @@
+import base64
+from io import BytesIO
 import streamlit as st
 import requests
 from streamlit_option_menu import option_menu
@@ -126,7 +128,8 @@ if page == "Summarize Document":
 
   
     # ------------------ File Upload --------------------------
- 
+    if "sample_file" not in st.session_state:
+        st.session_state.sample_file = None
     st.markdown(
     """
     <label style="
@@ -140,9 +143,35 @@ if page == "Summarize Document":
     """,
     unsafe_allow_html=True
     )
+    
+    uploaded_file = st.session_state.sample_file or st.file_uploader("", type=["pdf","docx","txt"])
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    uploaded_file = uploaded_file = st.file_uploader("", type=["pdf","docx","txt"])
+    st.markdown(
+"""
+<p style="
+    font-size:16px; 
+    color:#ffffff;
+    text-align:center;
+">
+    OR
+</p>
+""",
+unsafe_allow_html=True
+)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Use Sample Document"):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        sample_path = os.path.join(script_dir, "kome-text.pdf")
+
+        with open(sample_path, "rb") as f:
+            file_bytes = f.read()
+            st.session_state.sample_file = BytesIO(file_bytes)
+            st.session_state.sample_file.name = "kome-text.pdf"
+
     st.markdown("<br><br>", unsafe_allow_html=True)
+    
     if uploaded_file:
         st.success(f"File ready: {uploaded_file.name}")
 
@@ -241,8 +270,26 @@ if page == "Summarize Document":
                             unsafe_allow_html=True
                         )
 
-                        if tts and "audio_bytes" in result:
-                            st.audio(bytes.fromhex(result["audio_bytes"]))
+                        if tts and "audio" in result:
+
+                            audio_bytes = base64.b64decode(result["audio"])
+
+                            st.markdown("<br><br>", unsafe_allow_html=True)
+                            st.markdown(
+                                """
+                                <label style="
+                                    font-size:20px; 
+                                    font-weight:600; 
+                                    color:#CAE354;
+                                ">
+                                    Your speech is ready !
+                                </label>
+                                <br><br>
+                                """,
+                                unsafe_allow_html=True
+                            )
+
+                            st.audio(audio_bytes, format="audio/wav")
 
                 except Exception as e:
                     st.error(f"Error: {e}")
@@ -289,6 +336,33 @@ if page == "RAG - Intelligent Q&A":
     type=["pdf", "docx", "txt"]
     )   
     st.markdown("<br><br>", unsafe_allow_html=True)
+
+    st.markdown(
+"""
+<p style="
+    font-size:16px; 
+    color:#ffffff;
+    text-align:center;
+">
+    OR
+</p>
+""",
+unsafe_allow_html=True
+)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Use Sample Document"):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        sample_path = os.path.join(script_dir, "kome-text.pdf")
+
+        with open(sample_path, "rb") as f:
+            uploaded_file = BytesIO(f.read())
+            uploaded_file.name = "kome-text.pdf"
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    if uploaded_file:
+        st.success(f"File ready: {uploaded_file.name}")
 
 
     if uploaded_file:
@@ -356,7 +430,7 @@ if page == "RAG - Intelligent Q&A":
                 ">
                     Specify Your Language for response
                 </label>
-                <br><br>
+                <br>
                 """,
             unsafe_allow_html=True
         )
@@ -387,10 +461,12 @@ if page == "RAG - Intelligent Q&A":
                     # Handle response
                     if response.status_code == 200:
                         data = response.json()
+                        st.markdown("<br>", unsafe_allow_html=True)
                         st.success("Answer generated!")
                         st.write(data["answer"])
 
                         # Display source chunks if available
+                        st.markdown("<br>", unsafe_allow_html=True)
                         if data.get("sources"):
                             st.markdown("### Retrieved Sources")
                             for idx, src in enumerate(data["sources"], 1):

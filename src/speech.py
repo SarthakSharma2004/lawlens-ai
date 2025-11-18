@@ -1,30 +1,37 @@
-from elevenlabs import ElevenLabs
+from langchain_google_genai import ChatGoogleGenerativeAI
 from core.config import get_settings
 
 
 class TextToSpeech :
     settings = get_settings()
-    client = ElevenLabs(api_key = settings.ELEVENLABS_API_KEY)
+
+    client = ChatGoogleGenerativeAI(
+        model = "gemini-2.5-flash-preview-tts" , 
+        google_api_key = settings.GOOGLE_API_KEY
+    )
 
     @staticmethod
-    def text_to_speech(summary_text : str) -> bytes :
+    def text_to_speech(summary_text : str , language : str = "en") -> bytes :
         """
-        Converts summary text into speech using ElevenLabs
-        and returns MP3 bytes.
+        Converts summary text into speech using Google Gemini TTS
+        and returns audio bytes in WAV format.
         """
 
-        audio = TextToSpeech.client.text_to_speech.convert(
-            text = summary_text , 
-            voice_id = TextToSpeech.settings.ELEVENLABS_VOICE_ID ,
-            model_id = "eleven_multilingual_v2" ,
-            output_format = "mp3_44100_128" ,
-            voice_settings={
-                "stability": 0.4,
-                "similarity_boost": 0.9,
-                "speaking_rate": 0.9,
-            }
-        )
+        try :
+            response = TextToSpeech.client.invoke(
+                f"say this in a clear and professional voice in {language} : {summary_text}" , 
+                generation_config = {"response_modalities": ["AUDIO"]}
+            )
 
-        audio_bytes = b"".join(audio)
-        return audio_bytes
+            if "audio" in response.additional_kwargs :
+                audio_bytes = response.additional_kwargs['audio']
+                return audio_bytes
+            
+            else :
+                raise ValueError("Audio not found in response")
+            
+        except Exception as e :
+            raise RuntimeError(f"Error converting text to speech: {e}")
+
+
 

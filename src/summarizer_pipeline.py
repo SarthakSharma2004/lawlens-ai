@@ -30,7 +30,7 @@ class SummarizerPipeline :
 
             '''convert summary to speech'''
             if tts :
-                audio_bytes = TextToSpeech.text_to_speech(summary_text)
+                audio_bytes = TextToSpeech.text_to_speech(summary_text , language = self.language)
                 return summary_text , audio_bytes
             
           

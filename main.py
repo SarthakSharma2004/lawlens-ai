@@ -1,3 +1,4 @@
+import base64
 from fastapi import FastAPI, Form , UploadFile, File , HTTPException 
 from fastapi.responses import JSONResponse
 from pydantic import Field 
@@ -8,6 +9,8 @@ from pathlib import Path
 
 from core.config import get_settings
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 from src.summarizer_pipeline import SummarizerPipeline
 from rag.rag_pipeline import RagPipeline
@@ -22,6 +25,11 @@ MODEL_VERSION = "1.0.0"
 
 llm = ChatGroq(model = "llama-3.3-70b-versatile" , 
                api_key = settings.GROQ_API_KEY)
+
+# llm = ChatGoogleGenerativeAI(
+#     model = "gemini-2.5-pro" , 
+#     google_api_key = settings.GOOGLE_API_KEY
+# )
 
 rag_pipeline = RagPipeline(llm)
 
@@ -61,11 +69,13 @@ def read_health() :
 # SUMMARIZER
 # ------------
 
+
+
 @app.post("/summarize") 
 async def summarize_text(
     file : UploadFile = File(...) ,
     language : str = Form("English")  ,
-    tts : bool =Form(False)       
+    tts : bool = Form(False)       
 ) :
     
     tmp_path = None
@@ -103,17 +113,17 @@ async def summarize_text(
         result = pipeline.run(tmp_path , tts)
 
         if tts :
-            summary_text , audio_bytes = result
 
+  
+            summary_text , audio_bytes = result
             return {
-                "summary" : summary_text , 
-                "audio_bytes" : audio_bytes.hex()   # send audio as hex string
+                "summary": summary_text,
+                "audio": base64.b64encode(audio_bytes).decode()
             }
         
-        return {
-            "summary" : result
-        }
-        
+        return {"summary": result}
+
+            
 
     except Exception as e :
         raise HTTPException(status_code=500, detail=str(e))
@@ -121,7 +131,6 @@ async def summarize_text(
     finally :
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-
 
 
 
