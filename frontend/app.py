@@ -317,6 +317,8 @@ if page == "RAG - Intelligent Q&A":
 
 
     # ------------------ File Upload for RAG ----------------------
+    if "sample_file" not in st.session_state:
+        st.session_state.sample_file = None
     st.markdown(
     """
     <label style="
@@ -330,12 +332,9 @@ if page == "RAG - Intelligent Q&A":
     """,
     unsafe_allow_html=True
     )
-
-    uploaded_file = st.file_uploader(
-    "",
-    type=["pdf", "docx", "txt"]
-    )   
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    uploaded_file = st.session_state.sample_file or st.file_uploader("", type=["pdf","docx","txt"])
+    st.markdown("<br>", unsafe_allow_html=True)
 
     st.markdown(
 """
@@ -356,8 +355,9 @@ unsafe_allow_html=True
         sample_path = os.path.join(script_dir, "kome-text.pdf")
 
         with open(sample_path, "rb") as f:
-            uploaded_file = BytesIO(f.read())
-            uploaded_file.name = "kome-text.pdf"
+            file_bytes = f.read()
+            st.session_state.sample_file = BytesIO(file_bytes)
+            st.session_state.sample_file.name = "kome-text.pdf"
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
