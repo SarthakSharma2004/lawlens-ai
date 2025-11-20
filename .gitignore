@@ -2,7 +2,7 @@
 *.ipynb
 
 # Ignore PDF files
-*.pdf
+
 
 
 # Ignore specific personal 
