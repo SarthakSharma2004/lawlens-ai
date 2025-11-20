@@ -18,7 +18,17 @@ from pipelines.rag_pipeline import RagPipeline
 from schema.request_model import RAGInput
 from schema.response_model import RAGResponse, RAGSource
 
+from langsmith import Client
+
 settings = get_settings()
+
+# LANGSMITH TRACING
+os.environ["LANGCHAIN_API_KEY"] = settings.LANGCHAIN_API_KEY
+os.environ["LANGCHAIN_TRACING_V2"] = str(settings.LANGCHAIN_TRACING_V2).lower()
+os.environ["LANGCHAIN_PROJECT"] = settings.LANGCHAIN_PROJECT
+
+
+
 
 MODEL_VERSION = "1.0.0"
 
