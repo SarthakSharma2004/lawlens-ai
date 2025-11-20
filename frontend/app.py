@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath("."))
 from core.config import get_settings
 settings = get_settings()
 
-FASTAPI_URL = "http://13.233.108.145:8000/"   # your backend
+FASTAPI_URL = settings.FASTAPI_URL
 
 
 st.set_page_config(page_title="LawLens", layout="centered")

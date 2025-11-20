@@ -19,13 +19,15 @@ class Settings(BaseSettings):
     
     GOOGLE_API_KEY: str = Field(..., description="Google API Key")
     GROQ_API_KEY: str = Field(..., description="Groq API Key")
-    
+
     # ELEVENLABS_API_KEY : str = Field(..., description="Elevenlabs API Key")
     # ELEVENLABS_VOICE_ID : str = Field(..., description="Elevenlabs Voice ID")
 
     LANGCHAIN_API_KEY: str = Field(..., description="LangSmith/LangChain API Key")
     LANGCHAIN_TRACING_V2: bool = Field(default=True, description="Enable LangSmith tracing")
     LANGCHAIN_PROJECT: str = Field(..., description="LangSmith project name")
+
+    FASTAPI_URL : str = Field(... , description = "FastAPI URL")
 
 
 
