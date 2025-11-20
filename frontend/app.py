@@ -7,9 +7,9 @@ import sys, os
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("."))
 
-from core.config import get_settings
 
-settings = get_settings()
+SUPPORTED_LANGUAGES = ("English","Hindi","Spanish","French","German","Chinese","Japanese","Arabic")
+
 
 FASTAPI_URL = st.secrets["FASTAPI_URL"]
 
@@ -193,7 +193,7 @@ unsafe_allow_html=True
 
     language = st.selectbox(
         "",
-        settings.SUPPORTED_LANGUAGES
+        SUPPORTED_LANGUAGES
 
     )
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -436,7 +436,7 @@ unsafe_allow_html=True
 
         language = st.selectbox(
         "",
-            settings.SUPPORTED_LANGUAGES
+            SUPPORTED_LANGUAGES
         )
 
         st.markdown("<br><br>", unsafe_allow_html=True)
