@@ -7,10 +7,9 @@ import sys, os
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("."))
 
-from core.config import get_settings
-settings = get_settings()
 
-FASTAPI_URL = settings.FASTAPI_URL
+
+FASTAPI_URL = st.secrets["FASTAPI_URL"]
 
 
 st.set_page_config(page_title="LawLens", layout="centered")
