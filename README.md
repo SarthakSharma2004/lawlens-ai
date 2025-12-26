@@ -59,7 +59,7 @@ To ensure optimal performance, LawLens.ai dynamically adapts its **summarization
 
 - Gemini-TTS for natural audio generation
 
-- gemini embedding model for Q&A module
+- gemini embedding model & ChromaDB for Q&A module
 
 - LangChain + LangSmith for orchestration and full pipeline tracing
 
@@ -75,5 +75,137 @@ To ensure optimal performance, LawLens.ai dynamically adapts its **summarization
 
 ## ✨ Key Features
 
-- ⚡ **Adaptive Summarization Pipelines**
+- **🧠 Intelligent Legal Document Summarization**
+Helps users quickly understand lengthy legal contracts, agreements, and  documents by converting complex legal text into clear, concise summaries while preserving critical legal context.
+
+- **⚡ Adaptive Summarization Pipelines**
 Dynamically switches between Stuff and Map-Reduce strategies based on document length, achieving ~45% reduction in inference latency.
+
+- **🌍 Multi-Language Support**
+Generates summaries in the user’s preferred language, making legal content accessible to a broader audience.
+
+- **🔊 Optional Audio Playback (Text-to-Speech)**
+Enables speech-based playback of generated summaries in the selected language using *gemini-tts* for enhanced accessibility.
+
+- **🔍 Context-Aware Document Q&A**
+Adds an additional functionality to allow users to ask natural language questions over uploaded documents using **semantic retrieval** with embeddings and vector search utilising **ChromaDB**
+
+- **📦 Scalable Backend**
+Built with **FastAPI**, containerized using **Docker**, and deployed on **AWS** EC2 for scalable and reliable inference.
+
+- **📊 End-to-End Observability**
+Integrated LangSmith tracing to monitor prompts, LLM calls, latency, and failure points across the entire pipeline.
+
+- **🖥️ Interactive Web Interface**
+Clean and intuitive Streamlit UI enabling document upload, summarization, Q&A, and audio playback in a seamless workflow.
+
+
+---
+
+
+## 🛠️ Tech Stack
+
+🔹 Core Language & Frameworks
+
+- **🐍 Python** — Primary language for backend logic and AI pipelines
+
+- **🔗 LangChain** — Orchestrating summarization pipelines (Stuff & Map-Reduce) and Q&A workflows
+
+- **⚡ FastAPI** — High-performance REST API for LLM inference and service integration
+
+
+🔹 LLMs & AI Models
+
+- **🧠 LLaMA 3 (via Groq)** — Ultra-fast LLM inference for summarization and reasoning
+
+- **🌐 Gemini** — Embeddings for semantic retrieval and TTS for audio playback
+
+
+🔹 Retrieval & Storage
+
+- 🧾 **ChromaDB** — Vector database for storing embeddings and enabling semantic document search
+
+- 📁 **Document Chunking & Indexing** — Efficient handling of large legal documents
+
+🔹 Frontend & User Experience
+
+- **🖥️ Streamlit** — Interactive web interface for document upload, summarization, Q&A, and audio playback
+
+
+🔹 Infrastructure & Deployment
+
+- **📦 Docker** — Containerization for consistent builds and deployments
+
+- **☁️ AWS EC2** — Cloud deployment for scalable and reliable inference services
+
+
+🔹 Monitoring & Observability
+
+- **📊 LangSmith** — End-to-end tracing, latency monitoring, and prompt-level observability
+
+
+---
+
+
+## 🛠️ Installation & Setup
+
+Follow the steps below to set up LawLens.ai locally.
+
+### 📦 Clone the Repository
+
+```bash
+git clone https://github.com/SarthakSharma2004/lawlens-ai.git
+```
+
+### 🔑 Environment Variables
+
+```bash
+HUGGINGFACEHUB_API_TOKEN=
+GOOGLE_API_KEY=
+GROQ_API_KEY=
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_ID=
+LANGCHAIN_API_KEY=
+LANGCHAIN_TRACING_V2=
+LANGCHAIN_PROJECT=
+```
+
+### 🚀 Install Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+
+### 🎨 Run Locally (Without Docker)
+
+```bash
+Run FastAPI:
+
+uvicorn app.main:app --reload
+
+Run Streamlit:
+
+streamlit run frontend/app.py
+```
+
+### 🐳 Run with Docker
+
+```bash
+docker pull isarthak24/lawlens-backend
+docker run -p 8000:8000 --env-file .env isarthak24/lawlens-backend
+```
+
+
+---
+
+
+
+## 👨‍💻 Author
+Sarthak Sharma
+
+Data Science | Machine Learning | Deep Learning | NLP | GenAI
+
+[![Email](https://img.shields.io/badge/Email-Gmail-D14836?logo=gmail&logoColor=white)](mailto:2sarthaksharma@gmail.com)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sarthak-sharma-860b22259)
