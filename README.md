@@ -1,14 +1,19 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/LangChain-Framework-green"/>
   <img src="https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Streamlit-Frontend-FF4B4B?logo=streamlit&logoColor=white"/>
-  <img src="https://img.shields.io/badge/LangChain-Orchestration-1F68D0"/>
-  <img src="https://img.shields.io/badge/LangSmith-Tracing-orange"/>
-  <br/>
-  <img src="https://img.shields.io/badge/Groq-LLaMA_3_Inference-6E00FF"/>
-  <img src="https://img.shields.io/badge/Gemini-Embeddings_+_TTS-4285F4?logo=google&logoColor=white"/>
   <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white"/>
-  <img src="https://img.shields.io/badge/AWS-EC2_Deployment-FF9900?logo=amazonaws&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Streamlit-Web_App-FF4B4B?logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AWS-EC2-orange?logo=amazonaws&logoColor=white"/>
+  <br/>
+  <img src="https://img.shields.io/badge/LLM-Groq_LLaMA--3-black"/>
+  <img src="https://img.shields.io/badge/Gemini-Embeddings_+_TTS-blueviolet"/>
+  <img src="https://img.shields.io/badge/VectorDB-ChromaDB-yellowgreen"/>
+  <img src="https://img.shields.io/badge/LangSmith-Tracing_&_Observability-purple"/>
+  <br/>
+  <img src="https://img.shields.io/badge/Task-Document_Summarization-success"/>
+  <img src="https://img.shields.io/badge/LangChain-Stuff_Chain-lightgrey"/>
+  <img src="https://img.shields.io/badge/LangChain-Map--Reduce_Chain-lightgrey"/>
 </p>
 
 
